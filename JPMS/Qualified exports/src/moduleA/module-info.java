@@ -1,0 +1,6 @@
+module moduleA{
+requires moduleC;
+
+
+
+}

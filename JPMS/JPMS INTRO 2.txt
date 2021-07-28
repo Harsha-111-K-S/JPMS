@@ -1,0 +1,217 @@
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                                      INTRODUCTION PART - 2
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++++++++++++++++++++++++
+INTRODUCTION SECTION-1
++++++++++++++++++++++++
+
+-> There are mainly two goals of JPMS
+       -> Divide and conqure
+       -> Encapsulation
+-> Divide and conqure:
+       -> There will be a big problem
+       -> Dividing it into sub-problems
+       -> Finding solution to those
+       -> Combine the solution
+       -> Its like we have rt.jar which is huge, where in we divide the .class files into some 
+          modules in case of module based programming i.e JPMS, and using module-info.java we can combine
+          differnt modules.
+-> Encapsulation:
+       -> It basically mean that we are going to encapsulate certain modules under the name of modules
+       -> So that the accessing becomes more secured.
+       -> This is given by:
+              
+                    ++++++++++++              +++++++++++++
+                    | moduleA  | -----------> |  moduleB  |
+                    ++++++++++++       |      +++++++++++++
+                                       |
+                                       |       +++++++++++++ 
+                                       |-----> | moduleC   |
+                                               +++++++++++++
+       -> As per the above diagram the moduleA has some classes,but some of them requires the methodes
+          or other data from moduleB and moduleC. Which says the encapsulated classe from one module is secured
+           and can be accessed specifically.
+      -> One more advantage is independency among the modules i.e if there exsist a error in moduleA
+         only that will be affected not others.
+
++++++++++++++++++++++++
+INTRODUCTION SECTION-2
++++++++++++++++++++++++
+
+-> Creating more than one modules and interating between them.
+-> Let us know how to create the path of this, for working on two modules.
+
+     +++++++
+     | src |
+     +++++++
+          |      +++++++++++
+          |------| moduleA |
+          |      +++++++++++
+          |               |     ++++++++++++
+          |               |-----| package1 |
+          |               |     ++++++++++++
+          |               |               |     ++++++++++++++
+          |               |               |-----| .java file |
+          |               |                     ++++++++++++++
+          |               |     ++++++++++++++++++++
+          |               |-----| module-info.java |
+          |                     ++++++++++++++++++++  
+          |      +++++++++++
+          |------| moduleB |
+                 +++++++++++
+                          |     ++++++++++++
+                          |-----| package2 |
+                          |     ++++++++++++
+                          |               |     ++++++++++++++
+                          |               |-----| .java file |
+                          |                     ++++++++++++++
+                          |     ++++++++++++++++++++
+                          |-----| module-info.java |
+                                ++++++++++++++++++++  
+-> So as per the above directory stucture specified we need to create the files and folders
+-> say for example moduleA requires the method inside the moduleB then the program needs to be written as
+-> moduleA
+       -> module-info.java
+               module moduleA{
+               requires moduleB;
+              } 
+       -> package1
+            -> Test.java
+                  package package1;
+                  import package2.Test2;
+                  public class Test{
+                  public static void main(String[] args){
+                         Test2 t2 = new Test2();
+                         t2.print();
+                     }
+
+                 }   
+-> moduleB
+       -> module-info.java
+               module moduleB{
+                 exports package2;
+               }
+       -> package2
+            -> Test2.java
+                  package package2;
+                  public class Test2{
+                  public void print(){
+                         System.out.println("This statement is from moduleB and package2");
+                  }
+                  }
+-> After all these how we shell compile and run:
+-> For compiling:
+   ==========================================================
+    javac --module-source-path src -d out -m moduleA,moduleB
+   ========================================================== 
+-> After when you execute the above command the directory "out" with similar path as "src" will be
+   created, but all the files in "out" will have only .class files.
+-> For running we use the command:
+   =================================================
+    java --module-path out -m moduleA/package1.Test
+   =================================================
+-> NOTE:
+       -> If we dont use exports keyword inside the module-info.java then the method print()
+          wont be available/ accessable by moduleA
+       -> If we dont use requires in module-info.java the same this is applied.
+       -> (*)If we try to export a perticular class or a method from the package we will get an 
+          error. So the JVM will treat the word specified after the exports keyword as a package
+          name only.
+-> If we are using two different out files after compiling we have to use different command to 
+   run:
+   ===============================================================
+    java --upgrade-module-path out;out1 -m moduleA/package1.Test
+   ===============================================================
+-> Similarly say if we have maintained two seperate src folders then how shell we compile it.
+-> Using the following command:
+   ===============================================================
+    javac --module-source-path src;src2 -d out -m moduleA,moduleB
+   ===============================================================
+
++++++++++++++++++++++++ 
+INTRODUCTION SECTION-3
++++++++++++++++++++++++
+
+-> In this section we shell discuss discuss how to  works with three modules.
+-> say we have three modules
+      -> moduleA
+      -> moduleB
+      -> moduleC
+-> moduleA requires a method in moduleB
+-> moduleB exports the package2
+-> moduleC requires moduleA
+-> Now if i delete moduleB then automatically the JVM will throw the error without even executing 
+   furthur lines. But in java8 it will executing the furthur line of code.
+-> Now let us take one scenario, where in i will be deleting the "src2" folder of moduleB.
+-> And the rest two modules moduleA and moduleB are in "src" folder, but i have the compiled "out2" folder of the 
+   deleted "src2" folder.
+-> for this case how do we compile:
+-> the compilation code is given below:
+   =============================================================================
+    javac --module-source-path src --module-path out2 -d out -m moduleA,moduleC 
+   ============================================================================= 
+-> while running we have to use the command:
+   =======================================================
+    java --module-path out;out2 -m moduleC/package3.Test3
+   =======================================================     
+
++++++++++++++++++++++++
+INTRODUCTION SECTION-4
++++++++++++++++++++++++
+
+-> We all know that java9 contains some ready-made modules 
+-> so how can we access those
+-> See in this case of readymade modules we need not have to specify the --module-path option
+   it will be directly been mapped  to java command itself.
+-> We have another concept called observable modules:
+   ->observable modules:
+             -> built in modules
+             -> compile module-path is already provided to java command
+-> If we want to know which all are the built in modules that are available then we use the option 
+    ===============
+    --list-modules   
+    ===============
+-> This option should be used with "java" command i.e for example
+    =====================
+     java --list-modules
+    =====================
+-> if you want to know the user defined modules you need to specify the module-path i.e
+    =======================================
+     java --module-path out --list-modules
+    =======================================
+-> where out is the complied src folder.
+
++++++++++++++++++++++++
+INTRODUCTION SECTION-5
++++++++++++++++++++++++
+
+-> Readability and accessability
+
+
+    ++++++++++++++++++++++++++++++++++++     +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    |                                  |     |                                                     |
+    |            moduleA               |     |                        moduleB                      |
+    | +++++++++++++++++++++++++++++++  |reads|           +++++++++++++++++++++++++++++++           |
+    | |      requires moduleB       |  |---->|           |        exports package2     |           |
+    | |      module-info.java       |  |     |           |        module-info.java     |           |
+    | +++++++++++++++++++++++++++++++  |     |           +++++++++++++++++++++++++++++++           |
+    |                                  |     |         pacakge2          |     package3            |
+    |         ++++++++++++             |     | +++++++++++++ ++++++++++++|+++++++++++ ++++++++++++ |
+    |         | package1 |             |<----| |  m2.class | | m3.class ||| m4.class| | m5.class | |
+    |         | m1.class |             |reada| |  (public) | | (default)||| (public)| | (default)| |
+    |         ++++++++++++             |ble  | +++++++++++++ ++++++++++++|+++++++++++ ++++++++++++ |        
+    |                                  |by   |                           |                         | 
+    ++++++++++++++++++++++++++++++++++++     +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    
+-> moduleA can read moduleB as it has requires specified in module-info.java
+-> moduleB cannot read moduleA as it has specified only the exports in module-info.java
+-> Class m2 can be accessed by moduleA as it is made public.
+-> Class m3 cannot be accessed as it is made default.
+-> Classes m4 and m5 cannt be accesssed at all, as moduleB doesn't export package3.
+-> By using this we can actually make or impliment the security.
+
+
+
+
+ 

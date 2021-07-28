@@ -1,0 +1,142 @@
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                                     INTRODUCTION TO JPMS
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++++++++++++++++++++++++
+INTRODUCTION SECTION-1
++++++++++++++++++++++++
+
+-> Here lets discuss about the cyclic dependencies in modular programming.
+-> The cyclic basicaly mean, say we have two modules named moduleA and moduleB, if moduleA
+   requires moduleB and moduleB requires moduleA then this  is called a cyclic dependency.
+
+   ++++++++++++++               ++++++++++++++
+   |  moduleA   | <---------->  |   moduleB  |
+   ++++++++++++++               ++++++++++++++
+
+-> The java9 module based programming doesn't all cyclic dependencies. it will throw an error.
+-> The abservable modules what we have in java9 do not have cyclic dependencies.
+-> If we are developing any application, we need to make sure that we do not have any cyclic 
+   dependencies.
+
++++++++++++++++++++++++
+INTRODUCTION SECTION-2
++++++++++++++++++++++++
+
+-> Previously we have discussed about cyclic dependencies in java9.
+-> Now we shell discuss about the transitve dependencies in java9.
+-> yes, in java9 the transitive dependencies are allowed.
+-> say for example we have three modules, moduleA,moduleB,and moduleC
+       -> moduleB will read the moduleC
+       -> moduleA reads the moduleB
+       -> moduleA again requires moduleC
+       -> instead we seperatly make use of moduleC in moduleA, we can go for transitive depe
+          -ndency, as moduleB is already using the moduleC.
+   
+       ++++++++++++    reads     +++++++++++++    reads      +++++++++++++
+       | moduleA  |------------> |  moduleB  |-------------> |  moduleC  |
+       ++++++++++++              +++++++++++++               +++++++++++++
+-> Example program:
+   -> moduleC
+          -> module-info.java
+                -> export pack3;
+          -> pack3
+                ->Test3.java
+                     package pack3;
+                     public class Test3{
+                       public void print3(){
+                         System.out.println("This is from moduleC pack3");
+              
+                       }
+                     } 
+   -> moduleB
+          -> module-info.java
+                -> exports pack2;
+                -> requires transitive moduleC;
+          -> pack2
+                -> Test2.java
+                     package pack2;
+                     import pack3.Test3;
+                     public class Test2{
+                        public t3 print2(){
+                            System.out.println("This is from moduleB and pack2");
+                            Test3 t3 = new Test3();
+                            return t3;
+                        }
+                     }
+   -> moduleA
+          -> module-info.java
+                -> requires moduleB
+          -> pack1
+                -> Test.java
+                   package pack1;
+                   import pack2.Test2;
+                   import pack3.Test3;
+                   class Test{
+                      public static void main(String[] args){
+                         System.out.println("This is from moduleA and pack1");
+                         Test2 t2 = new Test2;
+                         Test3 t3 = t2.print2();
+                         t3.print3();
+                      }
+
+                  } 
+->NOTE:
+      -> In module-info.java of moduleB, if we specify
+            -> requires transitive moduleC
+      -> then which ever module requires the moduleB can also use moduleC too.
+      -> We must more concentrate on working with transitive dependencies in case 
+         of module based programming.
+
++++++++++++++++++++++++
+INTRODUCTION SECTION-3
++++++++++++++++++++++++
+
+-> Now we shell discuss, what if we have same package name in different modules.
+-> In case of non-modular based programming,
+   -> say we have two jar files,
+        -> jar1
+             -> pack1
+             -> pack2
+        -> jar2
+             -> pack2
+             -> pack3
+-> If this is the case then when we run, the jvm will combine the packages with same name.
+-> NOTE: we will run using classpath where jar1 has class-path1 and jar2 has class-path2.
+-> In the case of modular programming, say we have two modules
+       -> moduleA
+             -> pack1
+             -> pack2
+             -> module-info.java
+       -> moduleB
+             -> pack3
+             -> pack2
+             -> module-info.java
+-> When we compile them, the JVM will throw an error.
+-> So the package name in all the modules need to be different, else we get error.
+-> The abservable modules also have distinct package names. 
+
++++++++++++++++++++++++
+INTRODUCTION SECTION-4
++++++++++++++++++++++++
+
+-> In this section we shell discuss about the concept called aggrigate modules.
+-> so what is a aggrigate module?
+     -> say for example we have four modules moduleA, moduleB, moduleC, and moduleD.
+     -> now moduleD requires all the other modules.
+     -> so it is a studious job in order to write that requires moduleA,...moduleC in module-info
+        .java of moduleD. Therefore what we do is that we create another module which doesn't have any
+        specification but only have the module-info.java, including the required modules of moduleD.
+     -> then we just make use of this module in other modules which all requires the modules specified in this intermediate module.
+     -> This intermediate module is called as aggrigate module.
++++++++++++++++++++++++
+INTRODUCTION SECTION-5
++++++++++++++++++++++++
+
+-> In this section we will be discussing about the qualified exports
+-> This is actually based on security purpose
+-> say we have a moduleA which requires only perticular package of moduleB, then
+   this is been done using a concept of qualified exports. i.e
+   exports package_name to module_name,module_name....;
+   exports package_name to module_name;
+

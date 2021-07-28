@@ -1,0 +1,175 @@
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
+                                INTRODUCTION TO JPMS
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
++++++++++++++++++++++++
+INTRODUCTION SECTION-1 
++++++++++++++++++++++++
+
+-> JPMS stands for java platform module system.
+-> Introduced in the year 2017 under the version java 9.
+-> Development was begun in 2005.
+-> The JEP(jdk enhancement proposal) for this jpms was raised in 2005.
+-> The project name under which jpms was developed was jigsam.
+
++++++++++++++++++++++++
+INTRODUCTION SECTION-2
++++++++++++++++++++++++
+
+-> Until the java version 8, every thing was based on jar files.
+-> jar: group of packages, where in each packages contain group of .class files.
+-> From the java version 9, we dont have a concept of jar. every thing is dealed with modules.
+-> " Module is nothing but the group of packages with a special file called module-info.java."
+-> NOTE:
+        -> JAR do not maintain/ include any configuration information.
+        -> In case of modules the configuration information is stored in a special
+           file called "module-info.java".
+-> every module should have a file called module-info.java, if the jvm does'nt find it
+   we get an error.
+-> In java 9 the best thing is that all the predefined classes are been divided into set of 
+   modules.
+-> Where as in java 8, all the 4300+ classes were included in one single jar file named rt.jar.
+-> example for some modules in java 9 are:
+        -> java.base.module
+        -> java.sql.module
+        -> java.rmi.module
+        ->java.logging.module
+        ->java.desktop.module
+-> Let us know some of the packages that are available in some modules.
+        -> java.base.module
+             ->java.lang
+             ->java.util
+             ->java.io
+        -> java.desktop.module
+             -> java.awt
+             -> java.swing
+-> Now let us know how we can get the module name of a perticular class in java.
+        -> System.out.println(String.class.getModule());
+        -> System.out.println(System.class.getModule());
+-> So we got to know that we can get the module name of a class using the method available
+   getModule().
+-> The module-info.java contains the description of the module. The descrition include such as:
+        -> name of the module
+        -> dependencies
+        -> public packages
+
++++++++++++++++++++++++
+INTRODUCTION SECTION-3
++++++++++++++++++++++++
+
+-> In this section we shell discuss the differences between the jar and modules.
+
+Difference - 1:
+------------------------------------------------------------------------------------
+-> jar is only a group of packages
+-> module is also a group of packages including a special file module-info.java
+------------------------------------------------------------------------------------
+Difference - 2:
+------------------------------------------------------------------------------------
+-> In jar files if there are any dependencies then jvm will throw no class def found
+   error.
+-> But here no such kind of errors, as we will specify the dependencies in 
+   module-info.java.
+------------------------------------------------------------------------------------
+Difference - 3:
+------------------------------------------------------------------------------------
+-> jar files should be placed in classpath in perticular order, else it may lead to 
+   version conflicts and etc..
+-> module path, java considers the reqiured modules in the module-info.java, so there
+   wont be any version confilcts and etc..
+------------------------------------------------------------------------------------
+Difference - 4:
+------------------------------------------------------------------------------------
+-> In case of jar, security is less in terms of accessing the packages
+   (no restrictions in accessing the packages).
+-> In modules, we can specify the access of only perticular packages required.
+------------------------------------------------------------------------------------
+Difference - 5:
+------------------------------------------------------------------------------------
+-> Jar based applications become heavier.
+-> In module based, As we can get required modules specifically the application 
+   become lighter.
+------------------------------------------------------------------------------------
+
++++++++++++++++++++++++
+INTRODUCTION SECTION-4
++++++++++++++++++++++++
+
+-> Now we shell know what is JAR HELL or CLASSPATH HELL
+-> JAR HELL: The problems that are associated with jar files are known as jar hell.
+        ->Problems:
+               -> no class def found
+               -> version conflicts
+               -> security
+               -> monolithic structure(bigger size.(rt.jar))
+-> Goals of JPMS:
+        -> Reliable configuration( module-info.java ).
+        -> Strong encapsulation and security( access to only required packages).       
+        -> scalable java platform( small memory multiple files).
+        -> performance and memory improvements.
+
++++++++++++++++++++++++
+INTRODUCTION SECTION-5
++++++++++++++++++++++++
+
+-> In this section we are going to know how to write module-info.java
+-> structure of module-info.java:
+        
+        module module_name{
+          // 1. what other modules requires by this module.
+          //example:
+          
+          requires moduleA;
+          requires moduleB;
+          .
+          .
+          // 2. what packages exported by this module.
+          //example
+        
+          exports pack2;
+          exports pack3;
+          .
+          .
+
+        }
+-> here module,requires, and exports are keywords.
+
++++++++++++++++++++++++
+INTRODUCTION SECTION-6
++++++++++++++++++++++++
+
+-> In this section we shell the steps to develop first module based application:
+   ++++++++++++
+   | moduleA  |
+   ++++++++++++
+         |        ++++++++++++++++++++
+         |++++++++| module-info.java |
+         |         ++++++++++++++++++++
+         |        +++++++++++
+         |++++++++|  pack1  |
+         |        +++++++++++
+                       |        +++++++++++++
+                       |++++++++| test.java |
+                       |        +++++++++++++
+
+-> This is how we need to create the path and locate the files. As like in any IDE.
+-> For compiling the java module the command that is to be used is:
+       --------------------------------------------------------
+        -> javac --module-source-path src -d out -m module_name
+       --------------------------------------------------------
+-> The out folder will contain the .class files of the src folder files.
+-> For running the java module the command that is to be used is:
+       ----------------------------------------------------------------
+        -> java --module-path out -m module_name/package_name.file_name
+       ----------------------------------------------------------------
+-> The folders of the above things with example is placed(please check for more details.)
+-> Folder names: 
+        -> src
+        -> out
+        -> image of the output
+-> NOTE:
+        -> package statement is highly mandatory in java files.
+        -> Avoid giving module name terminating with a digit. Because it will surely gonna 
+           throw warning but the compilation does'nt stop.
+

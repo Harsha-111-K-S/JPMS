@@ -1,0 +1,4 @@
+module moduleD{
+requires moduleAGG;
+
+}
